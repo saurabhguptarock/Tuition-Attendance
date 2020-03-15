@@ -34,15 +34,34 @@ Future<void> createUserDatabase(FirebaseUser user) async {
   }
 }
 
-Future<void> createStudentDatabase(Students user) async {
-  // var doc = await _firestore.document('users/${user.uid}').get();
-  // if (!doc.exists) {
-  //   var userRef = _firestore.document('users/${user.uid}');
-  //   var data = {
-  //     'uid': user.uid,
-  //   };
-  //   userRef.setData(data, merge: true);
-  // }
+Future<void> createStudentDatabase(String uid, Student student) async {
+  _firestore.collection('users/$uid/students').add({
+    'address': student.address,
+    'age': student.age,
+    'applicableFees': student.applicableFees,
+    'batchTime': student.batchTime,
+    'classOfStudy': student.classOfStudy,
+    'dateAtWhichStudentGivesFees': student.dateAtWhichStudentGivesFees,
+    'dateOfAdmission': student.dateOfAdmission,
+    'dateOfLeaving': student.dateOfLeaving,
+    'email': student.email,
+    'feesDoneForMonth': student.feesDoneForMonth,
+    'feesGiven': student.feesGiven,
+    'gender': student.gender,
+    'hasLeftTuition': student.hasLeftTuition,
+    'mobileNo': student.mobileNo,
+    'modeOfPayment': student.modeOfPayment,
+    'name': student.name,
+    'noOfSiblings': student.noOfSiblings,
+    'photo': student.photo,
+    'school': student.school,
+    'secondaryMobileNo': student.secondaryMobileNo,
+    'siblings': student.siblings,
+    'totalFeesGiven': student.totalFeesGiven,
+    'uid': student.uid,
+  }).then((doc) {
+    doc.updateData({'uid': doc.documentID});
+  });
 }
 
 Stream<User> streamUser(String uid) {

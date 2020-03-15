@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuition_attendance/models/models.dart';
+import 'package:tuition_attendance/pages/add_student.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
 
@@ -14,64 +15,61 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Students> students = [];
-  String _filterType = 'All Students';
-  String _userUid;
+  List<Student> students = [];
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  getProducts() async {
+  getStudents(String uid) async {
     QuerySnapshot querySnapshot;
-    querySnapshot = await firebaseService.streamStudents(_userUid);
+    querySnapshot = await firebaseService.streamStudents(uid);
 
-    students.addAll(querySnapshot.documents
-        .map((data) => Students.fromFirestore(data))
-        .toList());
+    var _students = querySnapshot.documents
+        .map((data) => Student.fromFirestore(data))
+        .toList();
+    setState(() {
+      students = _students;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     //TODO: show slidable tabs for every class students
     User user = Provider.of<User>(context);
-    setState(() {
-      _userUid = user.uid;
-    });
+    if (user.uid != '') getStudents(user.uid);
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
         title: Text(
-          _filterType,
+          'Students',
           style: GoogleFonts.lato(),
         ),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.filter_list), onPressed: () {})
+          IconButton(
+              icon: Icon(Icons.person_add),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => StreamProvider<User>.value(
+                      value: firebaseService.streamUser(user.uid),
+                      initialData: User.fromMap({}),
+                      child: AddStudent(),
+                    ),
+                  ),
+                );
+              })
         ],
       ),
       body: ListView.builder(
         itemCount: students.length,
-        itemBuilder: (ctx, idx) => ListTile(
-          leading: CachedNetworkImage(
-            imageUrl: students[idx].photo,
-            imageBuilder: (ctx, image) => CircleAvatar(
-              backgroundImage: image,
-            ),
-            placeholder: (context, url) => Center(
-              child: Icon(
-                FontAwesomeIcons.hourglassHalf,
-                color: Colors.grey,
+        itemBuilder: (ctx, idx) => students[idx].photo == ''
+            ? ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/user.webp'),
+                ),
+              )
+            : ListTile(
+                leading: CircleAvatar(
+                  backgroundImage:
+                      CachedNetworkImageProvider(students[idx].photo),
+                ),
               ),
-            ),
-            errorWidget: (context, url, error) => Center(
-              child: Icon(
-                FontAwesomeIcons.hourglassHalf,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

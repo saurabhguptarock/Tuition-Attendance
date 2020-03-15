@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
@@ -65,8 +66,14 @@ class _AddStudentState extends State<AddStudent> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(
+          'Add Students',
+          style: GoogleFonts.lato(),
+        ),
+      ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -236,7 +243,7 @@ class _AddStudentState extends State<AddStudent> {
                       FormBuilderDateTimePicker(
                         attribute: "batchTime",
                         inputType: InputType.time,
-                        format: DateFormat("h:mm a"),
+                        format: DateFormat("H:mm"),
                         validators: [
                           FormBuilderValidators.required(),
                         ],
@@ -336,35 +343,9 @@ class _AddStudentState extends State<AddStudent> {
                         style:
                             GoogleFonts.lato(color: Colors.green, fontSize: 18),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_fbKey.currentState.saveAndValidate()) {
-                          var data = _fbKey.currentState.value;
-                          Students student = Students(
-                            uid: data['uid'],
-                            address: data['address'],
-                            applicableFees: data['applicableFees'],
-                            batchTime: data['batchTime'],
-                            classOfStudy: data['classOfStudy'],
-                            dateOfAdmission: data['dateOfAdmission'],
-                            dateOfLeaving: data['dateOfLeaving'],
-                            email: data['email'],
-                            feesDoneForMonth: data['feesDoneForMonth'],
-                            feesGiven: data['feesGiven'],
-                            age: data['age'],
-                            mobileNo: data['mobileNo'],
-                            modeOfPayment: data['modeOfPayment'],
-                            name: data['name'],
-                            noOfSiblings: data['noOfSiblings'],
-                            photo: data['photo'],
-                            school: data['school'],
-                            secondaryMobileNo: data['secondaryMobileNo'],
-                            siblings: data['siblings'],
-                            gender: data['gender'],
-                            totalFeesGiven: data['totalFeesGiven'],
-                            hasLeftTuition: data['hasLeftTuition'],
-                            dateAtWhichStudentGivesFees:
-                                data['dateAtWhichStudentGivesFees'],
-                          );
+                          String _downloadUrl;
                           if (_studentImage != null) {
                             pr.show();
                             startUpload();
@@ -377,11 +358,58 @@ class _AddStudentState extends State<AddStudent> {
                                         .toStringAsFixed(0)),
                               );
                             });
+                            _downloadUrl = await (await _uploadTask.onComplete)
+                                .ref
+                                .getDownloadURL();
                             pr.dismiss();
                           }
-                          firebaseService.createStudentDatabase(student);
+                          var data = _fbKey.currentState.value;
+
+                          Student student = Student(
+                            uid: data['uid'],
+                            address: data['address'],
+                            applicableFees: int.parse(data['applicableFees']),
+                            batchTime:
+                                DateFormat('H:mm').format(data['batchTime']),
+                            classOfStudy: int.parse(data['classOfStudy']),
+                            dateOfAdmission: DateFormat('dd-MM-yyyy')
+                                .format(data['dateOfAdmission']),
+                            dateOfLeaving: data['dateOfLeaving'] == null
+                                ? ''
+                                : DateFormat('dd-MM-yyyy')
+                                    .format(data['dateOfLeaving']),
+                            email: data['email'],
+                            feesDoneForMonth: data['feesDoneForMonth'],
+                            feesGiven: data['feesGiven'] != ''
+                                ? int.parse(data['feesGiven'])
+                                : 0,
+                            age: int.parse(data['age']),
+                            mobileNo: data['mobileNo'],
+                            modeOfPayment: data['modeOfPayment'],
+                            name: data['name'],
+                            noOfSiblings: int.parse(
+                                data['noOfSiblings'].round().toString()),
+                            photo: _studentImage == null ? '' : _downloadUrl,
+                            school: data['school'],
+                            secondaryMobileNo: data['secondaryMobileNo'],
+                            siblings: int.parse(data['noOfSiblings']
+                                        .round()
+                                        .toString()) >
+                                    0
+                                ? data['siblings']
+                                : '',
+                            gender: data['gender'],
+                            totalFeesGiven: int.parse(data['totalFeesGiven']),
+                            hasLeftTuition: data['hasLeftTuition'],
+                            dateAtWhichStudentGivesFees:
+                                DateFormat('dd-MM-yyyy').format(
+                                    data['dateAtWhichStudentGivesFees']),
+                          );
+                          firebaseService.createStudentDatabase(
+                              user.uid, student);
                           Toast.show('Student succesfully created', context,
                               duration: 5);
+                          Navigator.of(context).pop();
                         }
                       },
                     ),

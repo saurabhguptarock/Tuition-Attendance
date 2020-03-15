@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,7 +6,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuition_attendance/models/models.dart';
-import 'package:tuition_attendance/pages/add_student.dart';
 import 'package:tuition_attendance/pages/home_page.dart';
 import 'package:tuition_attendance/pages/login_screen.dart';
 
@@ -71,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return StreamProvider<User>.value(
         value: firebaseService.streamUser(user.uid),
         initialData: User.fromMap({}),
-        child: AddStudent(),
+        child: HomePage(),
       );
     } else
       return LoginPage();

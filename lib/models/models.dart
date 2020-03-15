@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Students {
+class Student {
   final String email;
   final String photo;
   final String modeOfPayment;
@@ -19,12 +19,12 @@ class Students {
   final String gender;
   final int applicableFees;
   final String school;
-  final double noOfSiblings;
+  final int noOfSiblings;
   final bool feesDoneForMonth;
   final int age;
   final int totalFeesGiven;
   final bool hasLeftTuition;
-  Students(
+  Student(
       {this.uid,
       this.email,
       this.photo,
@@ -49,9 +49,9 @@ class Students {
       this.hasLeftTuition,
       this.secondaryMobileNo});
 
-  factory Students.fromFirestore(DocumentSnapshot doc) {
+  factory Student.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
-    return Students(
+    return Student(
       uid: data['uid'] ?? '',
       address: data['address'] ?? '',
       applicableFees: data['applicableFees'] ?? 0,
