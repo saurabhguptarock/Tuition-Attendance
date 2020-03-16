@@ -15,12 +15,13 @@ class Student {
   final int classOfStudy;
   final String batchTime;
   final int feesGiven;
-  final String dateAtWhichStudentGivesFees;
+  final int dateAtWhichStudentGivesFees;
   final String gender;
   final int applicableFees;
   final String school;
   final int noOfSiblings;
-  final bool feesDoneForMonth;
+  final String lastGivenFeesDate;
+  final int maxTimeFeesNotGivenForMonth;
   final int age;
   final int totalFeesGiven;
   final bool hasLeftTuition;
@@ -41,7 +42,8 @@ class Student {
       this.school,
       this.noOfSiblings,
       this.siblings,
-      this.feesDoneForMonth,
+      this.lastGivenFeesDate,
+      this.maxTimeFeesNotGivenForMonth,
       this.gender,
       this.dateAtWhichStudentGivesFees,
       this.age,
@@ -60,7 +62,8 @@ class Student {
       dateOfAdmission: data['dateOfAdmission'] ?? '',
       dateOfLeaving: data['dateOfLeaving'] ?? '',
       email: data['email'] ?? '',
-      feesDoneForMonth: data['feesDoneForMonth'] ?? false,
+      lastGivenFeesDate: data['lastGivenFeesDate'] ?? '',
+      maxTimeFeesNotGivenForMonth: data['maxTimeFeesNotGivenForMonth'] ?? 0,
       feesGiven: data['feesGiven'] ?? 0,
       age: data['age'] ?? 0,
       mobileNo: data['mobileNo'] ?? '',

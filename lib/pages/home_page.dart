@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuition_attendance/models/models.dart';
 import 'package:tuition_attendance/pages/add_student.dart';
+import 'package:tuition_attendance/pages/edit_student.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
 
@@ -16,10 +17,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Student> students = [];
+  int _classOfStudy = 1;
 
   getStudents(String uid) async {
     QuerySnapshot querySnapshot;
-    querySnapshot = await firebaseService.streamStudents(uid);
+    querySnapshot = await firebaseService.streamStudents(uid, _classOfStudy);
 
     var _students = querySnapshot.documents
         .map((data) => Student.fromFirestore(data))
@@ -31,7 +33,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: show slidable tabs for every class students
     User user = Provider.of<User>(context);
     if (user.uid != '') getStudents(user.uid);
     return Scaffold(
@@ -53,23 +54,76 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 );
-              })
+              }),
+          Padding(padding: EdgeInsets.only(right: 20)),
+          SizedBox(
+            width: 100,
+            child: FormBuilderDropdown(
+              attribute: "class",
+              initialValue: '1',
+              style: GoogleFonts.lato(color: Colors.black),
+              onChanged: (d) {
+                setState(() {
+                  _classOfStudy = int.parse(d);
+                });
+                getStudents(user.uid);
+              },
+              items: [
+                '1',
+                '2',
+                '3',
+                '4',
+                '5',
+                '6',
+                '7',
+                '8',
+                '9',
+                '10',
+                '11',
+                '12'
+              ]
+                  .map(
+                    (gender) => DropdownMenuItem(
+                      value: gender,
+                      child: Text("$gender"),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ],
       ),
       body: ListView.builder(
         itemCount: students.length,
-        itemBuilder: (ctx, idx) => students[idx].photo == ''
-            ? ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/user.webp'),
-                ),
-              )
-            : ListTile(
-                leading: CircleAvatar(
-                  backgroundImage:
-                      CachedNetworkImageProvider(students[idx].photo),
+        itemBuilder: (ctx, idx) => ListTile(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => EditStudentDetails(
+                  student: students[idx],
+                  uid: user.uid,
                 ),
               ),
+            );
+          },
+          leading: CircleAvatar(
+            backgroundImage: students[idx].photo == ''
+                ? AssetImage('assets/images/user.webp')
+                : CachedNetworkImageProvider(students[idx].photo),
+          ),
+          title: Text(
+            students[idx].name,
+            style: GoogleFonts.lato(),
+          ),
+          subtitle: Text(
+            students[idx].batchTime,
+            style: GoogleFonts.lato(),
+          ),
+          trailing: Text(
+            students[idx].mobileNo,
+            style: GoogleFonts.lato(),
+          ),
+        ),
       ),
     );
   }

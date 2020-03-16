@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
@@ -13,12 +12,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:tuition_attendance/models/models.dart';
 
-class AddStudent extends StatefulWidget {
+class EditStudentDetails extends StatefulWidget {
+  final String uid;
+  final Student student;
+
+  const EditStudentDetails(
+      {Key key, @required this.uid, @required this.student})
+      : super(key: key);
   @override
-  _AddStudentState createState() => _AddStudentState();
+  _EditStudentDetailsState createState() => _EditStudentDetailsState();
 }
 
-class _AddStudentState extends State<AddStudent> {
+class _EditStudentDetailsState extends State<EditStudentDetails> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   double _noOfSiblings = 0;
   bool _studentLeftTuition = false;
@@ -38,6 +43,10 @@ class _AddStudentState extends State<AddStudent> {
 
   @override
   void initState() {
+    setState(() {
+      _noOfSiblings = widget.student.noOfSiblings.toDouble();
+      _studentLeftTuition = widget.student.hasLeftTuition;
+    });
     pr = ProgressDialog(context,
         isDismissible: false, type: ProgressDialogType.Download);
     pr.style(
@@ -61,16 +70,16 @@ class _AddStudentState extends State<AddStudent> {
             color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.bold),
       ),
     );
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Add Students',
+          'Update ${widget.student.name}',
           style: GoogleFonts.lato(),
         ),
       ),
@@ -85,10 +94,37 @@ class _AddStudentState extends State<AddStudent> {
                     EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
                 child: FormBuilder(
                   key: _fbKey,
-                  // initialValue: {
-                  //   'date': DateTime.now(),
-                  //   'accept_terms': false,
-                  // },
+                  initialValue: {
+                    'address': widget.student.address,
+                    'age': widget.student.age.toString(),
+                    'applicableFees': widget.student.applicableFees.toString(),
+                    'batchTime':
+                        DateFormat('H:mm').parse(widget.student.batchTime),
+                    'classOfStudy': widget.student.classOfStudy.toString(),
+                    'dateAtWhichStudentGivesFees':
+                        widget.student.dateAtWhichStudentGivesFees.toString(),
+                    'dateOfAdmission': DateFormat('dd-MM-yyyy')
+                        .parse(widget.student.dateOfAdmission),
+                    'dateOfLeaving': widget.student.dateOfLeaving == ''
+                        ? null
+                        : DateFormat('dd-MM-yyyy')
+                            .parse(widget.student.dateOfLeaving),
+                    'email': widget.student.email,
+                    'maxTimeFeesNotGivenForMonth':
+                        widget.student.maxTimeFeesNotGivenForMonth,
+                    'feesGiven': widget.student.feesGiven.toString(),
+                    'gender': widget.student.gender,
+                    'hasLeftTuition': widget.student.hasLeftTuition,
+                    'mobileNo': widget.student.mobileNo,
+                    'modeOfPayment': widget.student.modeOfPayment,
+                    'name': widget.student.name,
+                    'noOfSiblings': widget.student.noOfSiblings.toDouble(),
+                    'school': widget.student.school,
+                    'secondaryMobileNo': widget.student.secondaryMobileNo,
+                    'siblings': widget.student.siblings,
+                    'totalFeesGiven': widget.student.totalFeesGiven.toString(),
+                    'uid': widget.student.uid,
+                  },
                   autovalidate: true,
                   child: Column(
                     children: <Widget>[
@@ -326,9 +362,11 @@ class _AddStudentState extends State<AddStudent> {
                           });
                         },
                         leading: CircleAvatar(
-                          backgroundImage: _studentImage == null
+                          backgroundImage: widget.student.photo == ''
                               ? AssetImage('assets/images/user.webp')
-                              : FileImage(_studentImage),
+                              : _studentImage == null
+                                  ? NetworkImage(widget.student.photo)
+                                  : FileImage(_studentImage),
                         ),
                         title: Text(
                           'Image of Student',
@@ -343,13 +381,13 @@ class _AddStudentState extends State<AddStudent> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SizedBox(
-                    width: MediaQuery.of(context).size.width / 2,
+                    width: MediaQuery.of(context).size.width,
                     height: 50,
                     child: MaterialButton(
                       padding: EdgeInsets.all(0),
                       color: Colors.amber,
                       child: Text(
-                        "Submit",
+                        "Update User Data",
                         style:
                             GoogleFonts.lato(color: Colors.green, fontSize: 18),
                       ),
@@ -391,12 +429,10 @@ class _AddStudentState extends State<AddStudent> {
                             email: data['email'],
                             maxTimeFeesNotGivenForMonth:
                                 int.parse(data['maxTimeFeesNotGivenForMonth']),
-                            lastGivenFeesDate: _lastFeesGivenDate == null
-                                ? ''
-                                : DateFormat('dd-MM-yyyy')
-                                    .format(data['lastGivenFeesDate']),
-                            feesGiven: data['feesGiven'] != ''
-                                ? int.parse(data['feesGiven'])
+                            feesGiven: data['feesDoneForMonth'] == true
+                                ? data['feesGiven'] != '0'
+                                    ? int.parse(data['feesGiven'])
+                                    : 0
                                 : 0,
                             age: int.parse(data['age']),
                             mobileNo: data['mobileNo'],
@@ -416,34 +452,14 @@ class _AddStudentState extends State<AddStudent> {
                             gender: data['gender'],
                             totalFeesGiven: int.parse(data['totalFeesGiven']),
                             hasLeftTuition: data['hasLeftTuition'],
-                            dateAtWhichStudentGivesFees:
-                                int.parse(data['dateAtWhichStudentGivesFees']),
+                            lastGivenFeesDate: DateFormat('dd-MM-yyyy')
+                                .format(data['lastGivenFeesDate']),
                           );
-                          firebaseService.createStudentDatabase(
-                              user.uid, student);
+                          firebaseService.updateStudentDatabase(
+                              widget.uid, widget.student.uid, student);
                           Toast.show('Student succesfully created', context,
                               duration: 5);
-                          Navigator.of(context).pop();
                         }
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width / 2,
-                    child: MaterialButton(
-                      padding: EdgeInsets.all(0),
-                      color: Colors.amber,
-                      child: Text(
-                        "Reset",
-                        style:
-                            GoogleFonts.lato(color: Colors.red, fontSize: 18),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _fbKey.currentState.reset();
-                          _studentImage = null;
-                        });
                       },
                     ),
                   ),

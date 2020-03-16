@@ -45,7 +45,8 @@ Future<void> createStudentDatabase(String uid, Student student) async {
     'dateOfAdmission': student.dateOfAdmission,
     'dateOfLeaving': student.dateOfLeaving,
     'email': student.email,
-    'feesDoneForMonth': student.feesDoneForMonth,
+    'lastGivenFeesDate': student.lastGivenFeesDate,
+    'maxTimeFeesNotGivenForMonth': student.maxTimeFeesNotGivenForMonth,
     'feesGiven': student.feesGiven,
     'gender': student.gender,
     'hasLeftTuition': student.hasLeftTuition,
@@ -64,6 +65,36 @@ Future<void> createStudentDatabase(String uid, Student student) async {
   });
 }
 
+Future<void> updateStudentDatabase(
+    String uid, String studentId, Student student) async {
+  _firestore.document('users/$uid/students/$studentId').updateData({
+    'address': student.address,
+    'age': student.age,
+    'applicableFees': student.applicableFees,
+    'batchTime': student.batchTime,
+    'classOfStudy': student.classOfStudy,
+    'dateAtWhichStudentGivesFees': student.dateAtWhichStudentGivesFees,
+    'dateOfAdmission': student.dateOfAdmission,
+    'dateOfLeaving': student.dateOfLeaving,
+    'email': student.email,
+    'maxTimeFeesNotGivenForMonth': student.maxTimeFeesNotGivenForMonth,
+    'lastGivenFeesDate': student.lastGivenFeesDate,
+    'feesGiven': student.feesGiven,
+    'gender': student.gender,
+    'hasLeftTuition': student.hasLeftTuition,
+    'mobileNo': student.mobileNo,
+    'modeOfPayment': student.modeOfPayment,
+    'name': student.name,
+    'noOfSiblings': student.noOfSiblings,
+    'photo': student.photo,
+    'school': student.school,
+    'secondaryMobileNo': student.secondaryMobileNo,
+    'siblings': student.siblings,
+    'totalFeesGiven': student.totalFeesGiven,
+    'uid': student.uid,
+  });
+}
+
 Stream<User> streamUser(String uid) {
   return _firestore
       .collection('users')
@@ -72,8 +103,11 @@ Stream<User> streamUser(String uid) {
       .map((snap) => User.fromMap(snap.data));
 }
 
-Future<QuerySnapshot> streamStudents(String uid) {
-  return _firestore.collection('users/$uid/students').getDocuments();
+Future<QuerySnapshot> streamStudents(String uid, int classOfStudy) {
+  return _firestore
+      .collection('users/$uid/students')
+      .where('classOfStudy', isEqualTo: classOfStudy)
+      .getDocuments();
 }
 
 void signOut() {
