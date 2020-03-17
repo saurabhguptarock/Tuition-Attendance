@@ -110,7 +110,6 @@ class _AddStudentState extends State<AddStudent> {
                       FormBuilderTextField(
                         attribute: 'school',
                         keyboardType: TextInputType.text,
-                        validators: [FormBuilderValidators.required()],
                         decoration:
                             InputDecoration(labelText: "School of Student"),
                       ),
@@ -405,7 +404,8 @@ class _AddStudentState extends State<AddStudent> {
                             noOfSiblings: int.parse(
                                 data['noOfSiblings'].round().toString()),
                             photo: _studentImage == null ? '' : _downloadUrl,
-                            school: data['school'],
+                            school:
+                                data['school'] == null ? '' : data['school'],
                             secondaryMobileNo: data['secondaryMobileNo'],
                             siblings: int.parse(data['noOfSiblings']
                                         .round()

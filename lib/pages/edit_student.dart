@@ -47,6 +47,8 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
       _noOfSiblings = widget.student.noOfSiblings.toDouble();
       _studentLeftTuition = widget.student.hasLeftTuition;
     });
+    print(DateTime.now()
+        .difference(DateTime.parse(widget.student.lastGivenFeesDate)));
     pr = ProgressDialog(context,
         isDismissible: false, type: ProgressDialogType.Download);
     pr.style(
@@ -146,7 +148,6 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
                       FormBuilderTextField(
                         attribute: 'school',
                         keyboardType: TextInputType.text,
-                        validators: [FormBuilderValidators.required()],
                         decoration:
                             InputDecoration(labelText: "School of Student"),
                       ),
@@ -441,7 +442,8 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
                             noOfSiblings: int.parse(
                                 data['noOfSiblings'].round().toString()),
                             photo: _studentImage == null ? '' : _downloadUrl,
-                            school: data['school'],
+                            school:
+                                data['school'] == null ? '' : data['school'],
                             secondaryMobileNo: data['secondaryMobileNo'],
                             siblings: int.parse(data['noOfSiblings']
                                         .round()

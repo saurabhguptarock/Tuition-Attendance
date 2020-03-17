@@ -65,9 +65,16 @@ Future<void> createStudentDatabase(String uid, Student student) async {
   });
 }
 
+Future<void> updateStudentmaxTimeFeesNotGivenForMonth(
+    String uid, String studentId, int maxTimeFeesNotGivenForMonth) async {
+  await _firestore
+      .document('users/$uid/students/$studentId')
+      .updateData({'maxTimeFeesNotGivenForMonth': maxTimeFeesNotGivenForMonth});
+}
+
 Future<void> updateStudentDatabase(
     String uid, String studentId, Student student) async {
-  _firestore.document('users/$uid/students/$studentId').updateData({
+  await _firestore.document('users/$uid/students/$studentId').updateData({
     'address': student.address,
     'age': student.age,
     'applicableFees': student.applicableFees,
