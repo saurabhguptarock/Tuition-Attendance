@@ -47,8 +47,6 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
       _noOfSiblings = widget.student.noOfSiblings.toDouble();
       _studentLeftTuition = widget.student.hasLeftTuition;
     });
-    print(DateTime.now()
-        .difference(DateTime.parse(widget.student.lastGivenFeesDate)));
     pr = ProgressDialog(context,
         isDismissible: false, type: ProgressDialogType.Download);
     pr.style(

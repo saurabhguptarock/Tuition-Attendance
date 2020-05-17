@@ -77,7 +77,7 @@ class Student {
       gender: data['gender'] ?? '',
       totalFeesGiven: data['totalFeesGiven'] ?? 0,
       hasLeftTuition: data['hasLeftTuition'] ?? false,
-      dateAtWhichStudentGivesFees: data['dateAtWhichStudentGivesFees'] ?? '',
+      dateAtWhichStudentGivesFees: data['dateAtWhichStudentGivesFees'] ?? 0,
     );
   }
 }

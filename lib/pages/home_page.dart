@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tuition_attendance/models/models.dart';
 import 'package:tuition_attendance/pages/add_student.dart';
-import 'package:tuition_attendance/pages/edit_student.dart';
+import 'package:tuition_attendance/pages/student_details.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
 import 'package:url_launcher/url_launcher.dart';
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => EditStudentDetails(
+                builder: (ctx) => StudentDetails(
                   student: students[idx],
                   uid: user.uid,
                 ),
@@ -129,9 +129,12 @@ class _HomePageState extends State<HomePage> {
                 throw 'Could not launch $url';
               }
             },
-            child: Text(
-              students[idx].mobileNo,
-              style: GoogleFonts.lato(color: Colors.blue),
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Text(
+                students[idx].mobileNo,
+                style: GoogleFonts.lato(color: Colors.blue),
+              ),
             ),
           ),
         ),
