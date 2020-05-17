@@ -9,6 +9,7 @@ import 'package:tuition_attendance/pages/add_student.dart';
 import 'package:tuition_attendance/pages/edit_student.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebaseService;
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -119,9 +120,19 @@ class _HomePageState extends State<HomePage> {
             students[idx].batchTime,
             style: GoogleFonts.lato(),
           ),
-          trailing: Text(
-            students[idx].mobileNo,
-            style: GoogleFonts.lato(),
+          trailing: InkWell(
+            onTap: () async {
+              String url = "tel:${students[idx].mobileNo}";
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+            child: Text(
+              students[idx].mobileNo,
+              style: GoogleFonts.lato(color: Colors.blue),
+            ),
           ),
         ),
       ),
