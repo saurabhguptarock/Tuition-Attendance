@@ -370,7 +370,7 @@ class _AddStudentState extends State<AddStudent> {
                             _downloadUrl = await (await _uploadTask.onComplete)
                                 .ref
                                 .getDownloadURL();
-                            pr.dismiss();
+                            await pr.hide();
                           }
                           var data = _fbKey.currentState.value;
 

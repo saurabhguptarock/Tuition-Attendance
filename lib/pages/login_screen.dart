@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuition_attendance/services/firebase_service.dart'
     as firebase_service;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -12,16 +11,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool buttonInProgress = false;
-
-  void initState() {
-    initialize();
-    super.initState();
-  }
-
-  initialize() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isFirstTime', false);
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -408,7 +408,7 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
                             _downloadUrl = await (await _uploadTask.onComplete)
                                 .ref
                                 .getDownloadURL();
-                            pr.dismiss();
+                            await pr.hide();
                           }
                           var data = _fbKey.currentState.value;
 
