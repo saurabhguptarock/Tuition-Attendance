@@ -130,7 +130,6 @@ class _EditStudentDetailsState extends State<EditStudentDetails> {
                     children: <Widget>[
                       FormBuilderTextField(
                         attribute: 'name',
-                        autofocus: true,
                         validators: [FormBuilderValidators.required()],
                         keyboardType: TextInputType.text,
                         decoration:
