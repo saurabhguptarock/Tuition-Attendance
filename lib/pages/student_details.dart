@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tuition_attendance/models/models.dart';
@@ -43,6 +44,16 @@ class _StudentDetailsState extends State<StudentDetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              SizedBox(height: 15),
+              Center(
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage: widget.student.photo == ''
+                      ? AssetImage('assets/images/user.webp')
+                      : CachedNetworkImageProvider(widget.student.photo),
+                ),
+              ),
+              SizedBox(height: 15),
               studentDetail('Name', widget.student.name),
               studentDetail('Email', widget.student.email),
               studentDetail('Address', widget.student.address),
