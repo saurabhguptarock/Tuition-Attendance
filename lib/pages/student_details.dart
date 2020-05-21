@@ -124,11 +124,11 @@ class _StudentDetailsState extends State<StudentDetails> {
         children: <Widget>[
           Text(
             name,
-            style: GoogleFonts.lato(fontSize: 18, fontWeight: FontWeight.w600),
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           Text(
             data == '' || data == null ? 'No data' : data,
-            style: GoogleFonts.lato(),
+            style: GoogleFonts.lato(color: Colors.grey),
           ),
         ],
       ),
